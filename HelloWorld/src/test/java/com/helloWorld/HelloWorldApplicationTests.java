@@ -1,37 +1,53 @@
 package com.helloWorld;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class HelloWorldApplicationTests {
-	
-		@Value("${local.server.port}")
-	    private int port;
+import com.helloWorld.controller.HelloWorldController;
 
-	    @Autowired
-	    private TestRestTemplate restTemplate;
+@ExtendWith(MockitoExtension.class)
+public class HelloWorldApplicationTests {
 
-	    @Test
-	    public void testGetHello() {
-	        // Make a GET request to the endpoint and store the response in a String
-	        String response = restTemplate.getForObject("http://localhost:" + port + "/greetapi/v1/hello", String.class);
+    @InjectMocks
+    private HelloWorldController helloController;
 
-	        // Assert that the response is equal to "hello World !!!"
-	        assertThat(response).isEqualTo("hello World !!!");
-	    }
-	
-	    @Test
-	    public void testGetHelloWithName()
-	    {
-	    	String name="Shivam";
-	    	String expectedres="hello Shivam !!!";
-	    	String response=restTemplate.getForObject("http://localhost:" + port + "/greetapi/v1/hellowithname?name="+name, String.class);
-	    	assertThat(response).isEqualTo(expectedres);
-	    }
+    @Mock
+    private HttpServletRequest request;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(helloController).build();
+    }
+
+    @Test
+    public void testGetHelloWithParameter() throws Exception {
+        String name = "Alice";
+        String expectedResponse = "hello " + name + " !!!";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/greetapi/v1/hello").param("name", name))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
+    }
+
+    @Test
+    public void testGetHelloWithoutParameter() throws Exception {
+        String expectedResponse = "hello World !!!";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/greetapi/v1/hello"))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
+    }
 }
