@@ -1,9 +1,12 @@
 # GreetHello
 
-Sample request 
-Request: GET /greetapi/v1/hello
-Response:Hello World!!
+>Sample request  <br> 
+**Request**: GET /greetapi/v1/hello <br>
+**Response**:Hello World!!
 
-Sample request for greet with name
-Request: GET /greetapi/v1/hello?name=Shivam
-Response:Hello Shivam!!
+>Sample request for greet with name <br>
+**Request**: GET /greetapi/v1/hello?name=Shivam<br>
+**Response**:Hello Shivam!!
+
+>For test Api use postman or any Browser with localhost.
+>Example:-http://localhost:8080/greetapi/v1/hello?name=john
